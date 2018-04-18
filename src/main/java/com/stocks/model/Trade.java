@@ -26,4 +26,12 @@ public class Trade {
     public double getTradePrice() {
         return tradePrice;
     }
+
+    public int getNumberOfShares() {
+        return numberOfShares;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
 }

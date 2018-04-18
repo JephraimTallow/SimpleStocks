@@ -14,8 +14,14 @@ public interface StocksService {
      */
     public void recordTrade(Trade trade);
 
-    public BaseStock calculateStockPrice(StockTicker ticker);
+    public double calculateStockPrice(StockTicker ticker);
 
+    /**
+     * Trades are held with associated stock against the ticker value
+     * @return Map
+     */
     public Map<StockTicker, List<Trade>> getTickerTrades();
+
+    public List<Trade> getTradesByTimeframe(StockTicker ticker, int minutesPrevious);
 
 }
