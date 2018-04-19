@@ -34,4 +34,15 @@ public class Trade {
     public LocalDateTime getTimestamp() {
         return timestamp;
     }
+
+    @Override
+    public String toString() {
+        return "Trade{" +
+                "stock=" + stock +
+                ", timestamp=" + timestamp +
+                ", numberOfShares=" + numberOfShares +
+                ", tradePrice=" + tradePrice +
+                ", type=" + type +
+                '}';
+    }
 }

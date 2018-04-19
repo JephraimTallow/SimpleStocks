@@ -12,16 +12,34 @@ public interface StocksService {
     /**
      * Store the value of each trade within a spring bean for this exercise.
      */
-    public void recordTrade(Trade trade);
+    void recordTrade(Trade trade);
 
-    public double calculateStockPrice(StockTicker ticker);
+    /**
+     * The results are restricted to the previous xx minutes from the current timestamp
+     * @param ticker
+     * @return double
+     */
+    double calculateStockPrice(StockTicker ticker, int minutesPrevious);
 
     /**
      * Trades are held with associated stock against the ticker value
      * @return Map
      */
-    public Map<StockTicker, List<Trade>> getTickerTrades();
+    Map<StockTicker, List<Trade>> getTickerTrades();
 
-    public List<Trade> getTradesByTimeframe(StockTicker ticker, int minutesPrevious);
+    /**
+     * Return trades that are a specified number of minutes in the past to the current time
+     * @param ticker
+     * @param minutesPrevious
+     * @return List<Trade>
+     */
+    List<Trade> getTradesByTimeFrame(StockTicker ticker, int minutesPrevious);
+
+    /**
+     * Calculate the share index from the geometric mean - in this case the timeframe to look back at trades is included.
+     * @param minutesPrevious
+     * @return double
+     */
+    double calculateAllShareIndex(int minutesPrevious);
 
 }

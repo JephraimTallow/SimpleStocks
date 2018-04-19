@@ -48,33 +48,53 @@ public class RecordTradesTest {
     public void calculateStockPrice() {
         populateTradeData();
 
-        double calculatedStockPrice = stocksService.calculateStockPrice(StockTicker.GIN);
+        double calculatedStockPrice = stocksService.calculateStockPrice(StockTicker.GIN, 15);
         assertEquals(calculatedStockPrice,180, 1);
     }
 
     @Test
     public void checkTradesByTimeframe() {
-        //populateTradeData();
-
-        currentTrade = new Trade(new CommonStock(StockTicker.GIN, 8, 2, 100, 100),
+        // This is outside the timeframe and should not be included in the results
+        currentTrade = new Trade(new PreferredStock(StockTicker.GIN, 8, 2, 100, 100),
+                LocalDateTime.now().minusMinutes(40), 221, 201, TypeOfTrade.BUY);
+        stocksService.recordTrade(currentTrade);
+        // This is inside the timeframe and should be included in the results
+        currentTrade = new Trade(new PreferredStock(StockTicker.GIN, 8, 2, 100, 100),
                 LocalDateTime.now().minusMinutes(30), 221, 201, TypeOfTrade.BUY);
         stocksService.recordTrade(currentTrade);
 
-        List<Trade> tradesByTimeframe = stocksService.getTradesByTimeframe(StockTicker.GIN, 31);
+        List<Trade> tradesByTimeframe = stocksService.getTradesByTimeFrame(StockTicker.GIN, 31);
         assertEquals(1, tradesByTimeframe.size() ,0);
+    }
+
+    @Test
+    public void checkAllShareIndex() {
+        populateTradeData();
+
+        double allShareIndex = stocksService.calculateAllShareIndex(15);
+        assertEquals(28.6344, allShareIndex, 0.0001);
     }
 
     private void populateTradeData() {
         currentTrade = new Trade(new CommonStock(StockTicker.ALE, 0, 0, 100, 100),
                 LocalDateTime.now(), 300, 150, TypeOfTrade.BUY);
         stocksService.recordTrade(currentTrade);
-        currentTrade = new Trade(new CommonStock(StockTicker.GIN, 8, 2, 100, 100),
+        currentTrade = new Trade(new PreferredStock(StockTicker.GIN, 8, 2, 100, 100),
                 LocalDateTime.now(), 500, 175, TypeOfTrade.BUY);
         stocksService.recordTrade(currentTrade);
-        currentTrade = new Trade(new CommonStock(StockTicker.GIN, 8, 2, 100, 100),
+        currentTrade = new Trade(new PreferredStock(StockTicker.GIN, 8, 2, 100, 100),
                 LocalDateTime.now().plusMinutes(3), 500, 178, TypeOfTrade.BUY);
         stocksService.recordTrade(currentTrade);
-        currentTrade = new Trade(new CommonStock(StockTicker.GIN, 8, 2, 100, 100),
+        currentTrade = new Trade(new PreferredStock(StockTicker.GIN, 8, 2, 100, 100),
+                LocalDateTime.now().plusMinutes(3), 221, 201, TypeOfTrade.BUY);
+        stocksService.recordTrade(currentTrade);
+        currentTrade = new Trade(new CommonStock(StockTicker.TEA, 0, 0, 100, 100),
+                LocalDateTime.now(), 50, 110, TypeOfTrade.BUY);
+        stocksService.recordTrade(currentTrade);
+        currentTrade = new Trade(new CommonStock(StockTicker.POP, 8, 0, 100, 100),
+                LocalDateTime.now().minusMinutes(10), 500, 178, TypeOfTrade.BUY);
+        stocksService.recordTrade(currentTrade);
+        currentTrade = new Trade(new CommonStock(StockTicker.JOE, 13, 2, 100, 100),
                 LocalDateTime.now().plusMinutes(3), 221, 201, TypeOfTrade.BUY);
         stocksService.recordTrade(currentTrade);
     }

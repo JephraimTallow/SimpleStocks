@@ -5,15 +5,16 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
 public class StocksServiceImpl implements StocksService {
 
-    private Map<StockTicker, List<Trade>> tickerTrades = new HashMap<StockTicker, List<Trade>>();
+    private final Logger logger = Logger.getLogger(StocksServiceImpl.class.getName());
 
-    //private List<Trade> tradeList = new ArrayList<>();
+    private Map<StockTicker, List<Trade>> tickerTrades = new HashMap<>();
 
     @Override
     public void recordTrade(Trade trade) {
@@ -22,28 +23,21 @@ public class StocksServiceImpl implements StocksService {
             recordedTrades = new ArrayList<>();
         }
 
+        logger.log(Level.INFO, "Recording trade for - " + trade);
+
         recordedTrades.add(trade);
         tickerTrades.put(trade.getStock().getTicker(), recordedTrades);
     }
 
-    /**
-     * The results are restricted to the previous 15 minutes from the current timestamp
-     * @param ticker
-     * @return double
-     */
+
     @Override
-    public double calculateStockPrice(StockTicker ticker) {
-        List<Trade> trades = tickerTrades.get(ticker);
+    public double calculateStockPrice(StockTicker ticker, int minutesPrevious) {
 
-        //trades.stream().map(Trade::getIncludedTrades).collect(Collectors.toList());
-        // stream to get list of trades with timestamp t-15 or more
-
-        List<Trade> tradeList = getTradesByTimeframe(ticker, 15);
-
+        List<Trade> tradeList = getTradesByTimeFrame(ticker, minutesPrevious);
 
         double priceQuantity = 0;
         int totalNumberOfShares = 0;
-        for (Trade trade : trades) {
+        for (Trade trade : tradeList) {
             priceQuantity += trade.getTradePrice() * trade.getNumberOfShares();
             totalNumberOfShares += trade.getNumberOfShares();
         }
@@ -57,7 +51,7 @@ public class StocksServiceImpl implements StocksService {
     }
 
     @Override
-    public List<Trade> getTradesByTimeframe(StockTicker ticker, int minutesPrevious) {
+    public List<Trade> getTradesByTimeFrame(StockTicker ticker, int minutesPrevious) {
         List<Trade> trades = tickerTrades.get(ticker);
 
         List<Trade> tradeList = trades.stream()
@@ -67,7 +61,23 @@ public class StocksServiceImpl implements StocksService {
         return tradeList;
     }
 
-    public void setTickerTrades(Map<StockTicker, List<Trade>> tickerTrades) {
-        this.tickerTrades = tickerTrades;
+    @Override
+    public double calculateAllShareIndex(int minutesPreviouss) {
+
+
+        final double[] sumAllStockPrice = {0};
+
+        
+        tickerTrades.forEach((k, v) -> {
+            double sumStockPrice = calculateStockPrice(k, minutesPreviouss);
+            sumAllStockPrice[0] += sumStockPrice;
+        });
+
+//        for (Trade trade : trades) {
+//            double sumStockPrice = calculateStockPrice(trade.getStock().getTicker(), minutesPreviouss);
+//            sumAllStockPrice[0] += sumStockPrice;
+//        }
+        return Math.sqrt(sumAllStockPrice[0]);
     }
+
 }
