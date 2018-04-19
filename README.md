@@ -1,5 +1,8 @@
 # SimpleStocks
 GIN is the preferred stock option
 
-TODO - Logging, Exception handling, javadoc where needed.
+Minimal logging has been included - this would ideally be expanded
+
+Run the application with Maven:
+mvn clean install
 
